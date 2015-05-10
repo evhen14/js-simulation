@@ -1,7 +1,3 @@
-var settings = {
-    W: 1800,
-    H: 1000
-};
 var max_val = 10000000000;
 function Ball(rx, ry, vx, vy, radius, color, mass) {
     this.rx = rx;
@@ -72,13 +68,13 @@ Ball.prototype.bounceOfHorizontalWall = function() {
     this.vy = -this.vy;
     this.count++;
 };
-Ball.prototype.timeToHitVerticalWall = function() {
-    if (this.vx > 0)      return (settings.W - this.rx - this.radius) / this.vx;
+Ball.prototype.timeToHitVerticalWall = function(width) {
+    if (this.vx > 0)      return (width - this.rx - this.radius) / this.vx;
     else if (this.vx < 0) return (this.radius - this.rx) / this.vx;
     else                  return max_val;
 };
-Ball.prototype.timeToHitHorizontalWall = function() {
-    if (this.vy > 0)      return (settings.H - this.ry - this.radius) / this.vy;
+Ball.prototype.timeToHitHorizontalWall = function(height) {
+    if (this.vy > 0)      return (height - this.ry - this.radius) / this.vy;
     else if (this.vy < 0) return (this.radius - this.ry) / this.vy;
     else                  return max_val;
 };

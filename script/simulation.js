@@ -1,4 +1,4 @@
-(function(){
+var Simulation = (function(){
     var W = 1800, H = 1000;
     var Event = function(time, ball1, ball2) {
         this.time = time;
@@ -19,11 +19,10 @@
         return true;
     };
 
-    var Simulation = function(balls, canvas) {
+    var Simulation = function(balls, settings) {
         this.balls = balls;
         this.clockTime = 0;
         this.priorityQueue = new MaxHeap();
-        this.canvas = canvas;
 
         this.predict = function(ball, limit) {
             if (!ball) return;
@@ -32,8 +31,8 @@
                 if (deltaTime + this.clockTime < limit) {
                     this.priorityQueue.insert(new Event(deltaTime + this.clockTime, ball, this.balls[i]));
                 }
-                var dtX = ball.timeToHitVerticalWall();
-                var dtY = ball.timeToHitHorizontalWall();
+                var dtX = ball.timeToHitVerticalWall(settings.W);
+                var dtY = ball.timeToHitHorizontalWall(settings.H);
 
                 if (this.clockTime + dtX <= limit) {
                     this.priorityQueue.insert(new Event(this.clockTime + dtX, ball, undefined));
@@ -44,9 +43,9 @@
             }
         };
         this.redraw = function(limit){
-            ctx.clearRect(0, 0, W, H);
+            settings.ctx.clearRect(0, 0, W, H);
             for (var i = 0, len = this.balls.length; i < len; i++) {
-                this.balls[i].draw(this.canvas);
+                this.balls[i].draw(settings.ctx);
             }
             if (this.clockTime < limit) {
                 this.priorityQueue.insert(new Event(this.clockTime + 1.0 / 0.5, undefined, undefined));
@@ -102,18 +101,26 @@
         };
     };
 
+    return Simulation;
+
+})();
+
+(function(){
+    var settings = {
+        W: 1800,
+        H: 1000
+    };
+
     var W = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
     var H = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - 4;
-    settings.H = H;
-    settings.W = W;
     var canvas = document.getElementById("canvas");
-    canvas.width = W;
-    canvas.height = H;
+    settings.W = canvas.width = W;
+    settings.H = canvas.height = H;
     var ctx = canvas.getContext("2d");
-
+    settings.ctx = ctx;
     var color = 'red';
     var balls = [];
-    for (var i = 0; i < 100; ++i) {
+    for (var i = 0; i < 100; i++) {
         var rx, ry, vx, vy, radius;
         rx = Math.random() * W;
         ry = Math.random() * H;
@@ -123,7 +130,15 @@
         balls.push(new Ball(rx, ry, vx, vy, radius, color, radius));
     }
 
-    //balls.push(new Ball(W / 2, H / 2, 0, 0, H / 3, color, H / 3));
-    var simulation = new Simulation(balls, ctx);
+    window.onresize = function(){
+        var W = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        var H = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - 4;
+        settings.H = H;
+        settings.W = W;
+        canvas.width = W;
+        canvas.height = H;
+    };
+
+    var simulation = new Simulation(balls, settings);
     simulation.simulate(10000);
 })();

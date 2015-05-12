@@ -45,7 +45,7 @@ var Simulation = (function(){
         this.redraw = function(limit){
             settings.ctx.clearRect(0, 0, W, H);
             for (var i = 0, len = this.balls.length; i < len; i++) {
-                this.balls[i].draw(settings.ctx);
+                this.balls[i].draw(settings.ctx, settings.image);
             }
             if (this.clockTime < limit) {
                 this.priorityQueue.insert(new Event(this.clockTime + 1.0 / 0.5, undefined, undefined));
@@ -118,15 +118,15 @@ var Simulation = (function(){
     settings.H = canvas.height = H;
     var ctx = canvas.getContext("2d");
     settings.ctx = ctx;
-    var color = 'red';
+    var color = '#4A93B8';
     var balls = [];
-    for (var i = 0; i < 100; i++) {
+    for (var i = 0; i < 50; i++) {
         var rx, ry, vx, vy, radius;
         rx = Math.random() * W;
         ry = Math.random() * H;
         vx = Math.random() * 2 * (Math.random() < 0.5 ? -1 : 1);
         vy = Math.random() * 2 * (Math.random() < 0.5 ? -1 : 1);
-        radius = Math.random() * 3 + 6;
+        radius = Math.random() * 20 + 10;
         balls.push(new Ball(rx, ry, vx, vy, radius, color, radius));
     }
 
@@ -139,6 +139,9 @@ var Simulation = (function(){
         canvas.height = H;
     };
 
-    var simulation = new Simulation(balls, settings);
-    simulation.simulate(10000);
+    window.onload = function(){
+        settings.image = document.getElementById("test-image");
+        var simulation = new Simulation(balls, settings);
+        simulation.simulate(10000);
+    };
 })();

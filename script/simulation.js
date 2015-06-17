@@ -35,10 +35,10 @@ var Simulation = (function(){
                 var dtY = ball.timeToHitHorizontalWall(settings.H);
 
                 if (this.clockTime + dtX <= limit) {
-                    this.priorityQueue.insert(new Event(this.clockTime + dtX, ball, undefined));
+                    this.priorityQueue.insert(new Event(this.clockTime + dtX, ball, null));
                 }
                 if (this.clockTime + dtY <= limit) {
-                    this.priorityQueue.insert(new Event(this.clockTime + dtY, undefined, ball));
+                    this.priorityQueue.insert(new Event(this.clockTime + dtY, null, ball));
                 }
             }
         };
@@ -48,14 +48,14 @@ var Simulation = (function(){
                 this.balls[i].draw(settings.ctx, settings.image);
             }
             if (this.clockTime < limit) {
-                this.priorityQueue.insert(new Event(this.clockTime + 1.0 / 0.5, undefined, undefined));
+                this.priorityQueue.insert(new Event(this.clockTime + 1.0 / 0.5, null, null));
             }
         };
         this.simulate = function(limit) {
             for (var i = 0, len = this.balls.length; i < len; i++) {
                 this.predict(this.balls[i], limit);
             }
-            this.priorityQueue.insert(new Event(20, undefined, undefined));        // redraw event
+            this.priorityQueue.insert(new Event(20, null, null));        // redraw event
 
             this.redraw(limit);
 

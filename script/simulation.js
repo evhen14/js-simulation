@@ -14,8 +14,8 @@ var Simulation = (function(){
     };
 
     Event.prototype.isValid = function() {
-        if (this.ball1 != null && this.ball1.count != this.count1) return false;
-        if (this.ball2 != null && this.ball2.count != this.count2) return false;
+        if (this.ball1 !== null && this.ball1.count != this.count1) return false;
+        if (this.ball2 !== null && this.ball2.count != this.count2) return false;
         return true;
     };
 
@@ -81,7 +81,7 @@ var Simulation = (function(){
                 that.clockTime = event.time;
 
                 // process event
-                if (ball1 == null && ball2 == null) {
+                if (ball1 === null && ball2 === null) {
                     that.redraw(limit);
                     that.predict(ball1, limit);
                     that.predict(ball2, limit);

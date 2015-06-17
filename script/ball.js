@@ -8,13 +8,13 @@ function Ball(rx, ry, vx, vy, radius, color, mass) {
     this.mass = mass || 1;
     this.count = -1;
     this.radius = radius;
-};
+}
 Ball.prototype.draw = function(canvas, image) {
     canvas.beginPath();
     canvas.arc(this.rx, this.ry, this.radius, 0, Math.PI * 2, false);
     canvas.strokeStyle = this.color;
     canvas.lineWidth = 2;
-    canvas.stroke()
+    canvas.stroke();
     canvas.closePath();
     canvas.drawImage(image, this.rx - this.radius, this.ry - this.radius - 2, this.radius * 2, this.radius * 2);
     };

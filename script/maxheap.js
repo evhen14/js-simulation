@@ -66,7 +66,7 @@ var MaxHeap = function(arr, comp) {
             for (j = 0; j < i && i - 1 + j < items.length; ++j) {
                 res += items[i - 1 + j] + '  ';
             }
-            console.log(res)
+            console.log(res);
         }
     };
 };

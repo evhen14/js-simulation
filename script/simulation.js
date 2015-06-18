@@ -1,6 +1,8 @@
-var Simulation = (function(){
+/*global document, window, alert, console, require, Ball, MaxHeap*/
+(function () { 'use strict'; }());
+var Simulation = (function () {
     var W = 1800, H = 1000;
-    var Event = function(time, ball1, ball2) {
+    var Event = function (time, ball1, ball2) {
         this.time = time;
         this.ball1 = ball1;
         this.ball2 = ball2;
@@ -9,30 +11,31 @@ var Simulation = (function(){
 
     };
 
-    Event.prototype.getValue = function() {
+    Event.prototype.getValue = function () {
         return this.time;
     };
 
-    Event.prototype.isValid = function() {
-        if (this.ball1 !== null && this.ball1.count != this.count1) return false;
-        if (this.ball2 !== null && this.ball2.count != this.count2) return false;
+    Event.prototype.isValid = function () {
+        if (this.ball1 !== null && this.ball1.count !== this.count1) { return false; }
+        if (this.ball2 !== null && this.ball2.count !== this.count2) { return false; }
         return true;
     };
 
-    var Simulation = function(balls, settings) {
+    var Simulation = function (balls, settings) {
         this.balls = balls;
         this.clockTime = 0;
         this.priorityQueue = new MaxHeap();
 
-        this.predict = function(ball, limit) {
-            if (!ball) return;
-            for (var i = 0, len = this.balls.length; i < len; ++i) {
-                var deltaTime = ball.timeToCollision(this.balls[i]);
+        this.predict = function (ball, limit) {
+            if (!ball) { return; }
+            var i, len, deltaTime, dtX, dtY;
+            for (i = 0, len = this.balls.length; i < len; i += 1) {
+                deltaTime = ball.timeToCollision(this.balls[i]);
                 if (deltaTime + this.clockTime < limit) {
                     this.priorityQueue.insert(new Event(deltaTime + this.clockTime, ball, this.balls[i]));
                 }
-                var dtX = ball.timeToHitVerticalWall(settings.W);
-                var dtY = ball.timeToHitHorizontalWall(settings.H);
+                dtX = ball.timeToHitVerticalWall(settings.W);
+                dtY = ball.timeToHitHorizontalWall(settings.H);
 
                 if (this.clockTime + dtX <= limit) {
                     this.priorityQueue.insert(new Event(this.clockTime + dtX, ball, null));
@@ -42,17 +45,19 @@ var Simulation = (function(){
                 }
             }
         };
-        this.redraw = function(limit){
+        this.redraw = function (limit) {
             settings.ctx.clearRect(0, 0, W, H);
-            for (var i = 0, len = this.balls.length; i < len; i++) {
+            var i, len;
+            for (i = 0, len = this.balls.length; i < len; i += 1) {
                 this.balls[i].draw(settings.ctx, settings.image);
             }
             if (this.clockTime < limit) {
                 this.priorityQueue.insert(new Event(this.clockTime + 1.0 / 0.5, null, null));
             }
         };
-        this.simulate = function(limit) {
-            for (var i = 0, len = this.balls.length; i < len; i++) {
+        this.simulate = function (limit) {
+            var i, len;
+            for (i = 0, len = this.balls.length; i < len; i += 1) {
                 this.predict(this.balls[i], limit);
             }
             this.priorityQueue.insert(new Event(20, null, null));        // redraw event
@@ -60,9 +65,8 @@ var Simulation = (function(){
             this.redraw(limit);
 
             var that = this;
-            var cycle = function() {
-                if (that.priorityQueue.size() <= 0)
-                    return;
+            var cycle = function () {
+                if (that.priorityQueue.size() <= 0) { return; }
 
                 // get impending event, discard if invalidated
                 // update the priority queue with new collisions involving a or b
@@ -76,8 +80,9 @@ var Simulation = (function(){
                 var ball2 = event.ball2;
 
                 // physical collision, so update positions, and then simulation clock
-                for (var i = 0, len = that.balls.length; i < len; i++)
+                for (i = 0, len = that.balls.length; i < len; i += 1) {
                     that.balls[i].move(event.time - that.clockTime);
+                }
                 that.clockTime = event.time;
 
                 // process event
@@ -86,11 +91,14 @@ var Simulation = (function(){
                     that.predict(ball1, limit);
                     that.predict(ball2, limit);
                     setTimeout(cycle, 10);
-                }
-                else {
-                    if      (ball1 && ball2) ball1.bounceOff(ball2);              // particle-particle collision
-                    else if (ball1 && !ball2) ball1.bounceOfVerticalWall();   // particle-wall collision
-                    else if (!ball1 && ball2) ball2.bounceOfHorizontalWall(); // particle-wall collision
+                } else {
+                    if (ball1 && ball2) {
+                        ball1.bounceOff(ball2);
+                    } else if (ball1 && !ball2) {
+                        ball1.bounceOfVerticalWall();
+                    } else if (!ball1 && ball2) {
+                        ball2.bounceOfHorizontalWall();
+                    }
                     that.predict(ball1, limit);
                     that.predict(ball2, limit);
                     cycle();
@@ -103,9 +111,9 @@ var Simulation = (function(){
 
     return Simulation;
 
-})();
+}());
 
-(function(){
+(function () {
     var settings = {
         W: 1800,
         H: 1000
@@ -120,8 +128,8 @@ var Simulation = (function(){
     settings.ctx = ctx;
     var color = '#4A93B8';
     var balls = [];
-    for (var i = 0; i < 50; i++) {
-        var rx, ry, vx, vy, radius;
+    var i, rx, ry, vx, vy, radius;
+    for (i = 0; i < 50; i += 1) {
         rx = Math.random() * W;
         ry = Math.random() * H;
         vx = Math.random() * 2 * (Math.random() < 0.5 ? -1 : 1);
@@ -130,18 +138,18 @@ var Simulation = (function(){
         balls.push(new Ball(rx, ry, vx, vy, radius, color, radius));
     }
 
-    window.onresize = function(){
-        var W = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-        var H = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - 4;
+    window.onresize = function () {
+        W = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+        H = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - 4;
         settings.H = H;
         settings.W = W;
         canvas.width = W;
         canvas.height = H;
     };
 
-    window.onload = function(){
+    window.onload = function () {
         settings.image = document.getElementById("test-image");
         var simulation = new Simulation(balls, settings);
         simulation.simulate(10000);
     };
-})();
+}());
